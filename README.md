@@ -1,6 +1,6 @@
 # React authentication & access control
 
-Authentication & access control are required for most applications, but they distract us from building core features.
+Authentication & access control are required for most applications, but they often distract us from building core features.
 
 In this article, I'll cover a straightforward way to add auth & access control in React.
 
@@ -13,13 +13,13 @@ There are two main things your React application needs to do to sign on a user:
 1. Get an access token from an authentication server
 2. Send the access token to your backend server with each subsequent request
 
-These steps are the same for pretty much all authentication, whether that's standard email & password, magic links, or single sign on (SSO) logins like Google, Azure, or Facebook.
+These steps are the same for pretty much all authentication, whether that's standard email & password, magic links, or single sign on (SSO) providers like Google, Azure, or Facebook.
 
 Ultimately, we want our React app to send an initial request to an authentication server and have that server generate an access token we can use.
 
 ## JWT access tokens
 
-There are different choices for what type of access token to use, but JSON Web Tokens (JWTs) are a great option. JWTs are compact, URL-safe tokens that your React application can use for authentication and access control.
+There are different choices for what type of access token to use, and JSON Web Tokens (JWTs) are a great option. JWTs are compact, URL-safe tokens that your React application can use for authentication and access control.
 
 Each JWT has a JSON object as its “payload” and is signed such that your backend server can verify that the payload is authentic. An example JWT looks like:
 
@@ -53,24 +53,26 @@ When your backend server receives a request with a JWT, it should verify the JWT
 
 The flow for using a JWT in your React application looks like this:
 
-1. Your React app requests a JWT whenever the user wants to sign on.
+1. Your React app requests a JWT from the authentication server whenever the user wants to sign on.
 2. The authentication server generates a JWT using a private key and then sends the JWT back to your React app.
-3. Your React app stores this JWT and sends it to your application server whenever your user needs to make a request.
-4. Your application server verifies the JWT using a public key and then reads the payload to determine which user is making the request.
+3. Your React app stores this JWT and sends it to your backend server whenever your user needs to make a request.
+4. Your backend server verifies the JWT using a public key and then reads the payload to determine which user is making the request.
 
 Each of these steps is simple to write down, but each step has its own pitfalls when you actually want to implement it and keep it secure. Especially over time, as new threat vectors emerge and new platforms need to be patched or supported, the security overhead can add up quickly.
 
 ## Userfront removes auth complexity in React apps
 
-Userfront is a framework that abstracts away auth complexity. This makes it much easier for you to work with authentication in a React application and, perhaps most importantly, keeps all the auth protocols updated for you automatically over time.
+Userfront is a framework that abstracts away auth complexity. This makes it much easier for you to work with authentication in a React application and, perhaps most importantly, it keeps all the auth protocols updated for you automatically over time.
 
-The underlying philosophy with Userfront is that world-class auth should not take effort – it should be easy to set up, and security updates should happen for you automatically. Userfront has all the bells and whistles of authentication, Single Sign On (SSO), access control, and multi-tenancy, with a production-ready free tier up to 10,000 monthly active users. For most modern React applications, it’s a great solution.
+The underlying philosophy with Userfront is that world-class auth should not take effort – it should be easy to set up, and security updates should happen for you automatically. Userfront has all the bells and whistles of authentication, Single Sign On (SSO), access control, and multi-tenancy, with a production-ready free tier up to 10,000 monthly active users.
+
+For most modern React applications, it’s a great solution.
 
 ### Setting up authentication in React
 
-Now we will go through building all the main aspects of authentication in a React application. The final code for this example is available [here](https://github.com/tyrw/css-tricks-react-auth).
+Now we'll go through building all the main aspects of authentication in a React application. The final code for this example is available [here](https://github.com/tyrw/css-tricks-react-auth).
 
-Use your favorite boilerplate to set up your React application and get your build pipeline in order. In this article, we’ll use [Create React App](https://reactjs.org/docs/create-a-new-react-app.html), which does a lot of the setup work for us, and we’ll also add [React Router](https://reactrouter.com/web/guides/quick-start) for our client-side routing. Start by installing Create React App and React Router:
+Set up your React application and get your build pipeline in order however you prefer. In this tutorial, we’ll use [Create React App](https://reactjs.org/docs/create-a-new-react-app.html), which does a lot of the setup work for us, and we’ll also add [React Router](https://reactrouter.com/web/guides/quick-start) for client-side routing. Start by installing Create React App and React Router:
 
 ```js
 npx create-react-app my-app
@@ -83,7 +85,7 @@ Now our React application is available at http://localhost:3000
 
 ![Create React App authentication](https://res.cloudinary.com/component/image/upload/v1612896738/permanent/create-react-app.gif)
 
-Just like it says, we can now edit the `src/App.js` file to start working.
+Like the page says, we can now edit the `src/App.js` file to start working.
 
 Replace the contents of `src/App.js` with the following, based on the React Router quickstart:
 
@@ -150,7 +152,7 @@ function Dashboard() {
 }
 ```
 
-Now we have a very simple app with routing:
+Now we have ourselves a very simple app with routing:
 
 | Route        | Description                              |
 | :----------- | :--------------------------------------- |
@@ -165,20 +167,20 @@ This is all the structure we need to start adding authentication.
 
 ### Signup, login, and password reset with Userfront
 
-First, create a Userfront account at https://userfront.com. This will give you a signup form, login form, and password reset form you can use for the next steps.
+Go ahead and create a Userfront account at https://userfront.com. This will give you a signup form, login form, and password reset form you can use for the next steps.
 
 In the Toolkit section of your Userfront dashboard, you can find the instructions for installing your signup form:
 
 ![Userfront installation instructions](https://res.cloudinary.com/component/image/upload/v1614094834/permanent/instructions-react.png)
 
-Follow the instructions by installing the Userfront react package with:
+Follow the instructions by installing the Userfront React package with:
 
 ```js
 npm install @userfront/react --save
 npm start
 ```
 
-Then add the form to your home page by importing and initializing Userfront, and then updating the `Home()` function to render the form.
+Add the signup form to your home page by importing and initializing Userfront, and then updating the `Home()` function to render the signup form.
 
 ```js
 // src/App.js
@@ -259,7 +261,7 @@ Now the home page has your signup form. Try signing up a user:
 
 ![React signup form](https://res.cloudinary.com/component/image/upload/v1614095453/permanent/react-router-signup.png)
 
-The form is in "Test mode" by default, which will create user records in a test environment you can view separately in your Userfront dashboard:
+Your signup form is in "Test mode" by default, which will create user records in a test environment you can view separately in your Userfront dashboard:
 
 ![Userfront test mode](https://res.cloudinary.com/component/image/upload/v1612980797/permanent/create-react-app-2.png)
 
@@ -370,7 +372,7 @@ Whenever a user is not logged in but tries to visit `/dashboard`, we can redirec
 
 We can accomplish this by updating the `Dashboard` component in `src/App.js` to handle the conditional logic.
 
-When a user is logged in with Userfront, they will have an access token available as `Userfront.accessToken()`. We can check for this token to determine if the user is logged in.
+When a user is logged in with Userfront, they will have an access token available as `Userfront.accessToken()`. We can check for this token to determine if the user is logged in. If the user is logged in, we can show the dashboard page, and if the user is not logged in, we can redirect to the login page.
 
 Add the `Redirect` component to the `import` statement for React Router, and then update the `Dashboard` component to redirect if no access token is present.
 
@@ -429,17 +431,19 @@ Now, when a user is logged in, they can view the dashboard. If the user is not l
 
 ## React authentication with an API
 
-You will probably want to retrieve user-specific information from your backend. In order to protect these API endpoints, your server should check that incoming JWTs are valid.
+You'll probably want to retrieve user-specific information from your backend. In order to protect your API endpoints, your backend server should check that incoming JWTs are valid.
 
-There are many libraries to read and verify JWTs across various languages; here are a few popular libraries for handling JWTs:
+There are many libraries available to read and verify JWTs across various languages; here are a few popular libraries for handling JWTs:
 
 |                                                       |                                           |                                              |                                           |
 | ----------------------------------------------------- | ----------------------------------------- | -------------------------------------------- | ----------------------------------------- |
 | [Node.js](https://github.com/auth0/node-jsonwebtoken) | [.NET](https://github.com/jwt-dotnet/jwt) | [Python](https://github.com/jpadilla/pyjwt/) | [Java](https://github.com/auth0/java-jwt) |
 
-For Userfront, the access token is available in your React application as `Userfront.accessToken()`.
+### Your access token
 
-Your React application can send this as a `Bearer` token inside the `Authorization` header. For example:
+While the user is logged in, their access token is available in your React application as `Userfront.accessToken()`.
+
+Your React application can send this as a `Bearer` token inside the `Authorization` header to your backend server. For example:
 
 ```js
 // Example of calling an endpoint with a JWT
@@ -464,7 +468,7 @@ getInfo();
 
 To handle a request like this, your backend should read the JWT from the `Authorization` header and verify that it is valid using the public key found in your Userfront dashboard.
 
-Here is an example of Node.js middleware to read and verify the JWT:
+Here is an example of Node.js middleware to read and verify the JWT access token:
 
 ```js
 // Node.js example (Express.js)
@@ -495,7 +499,7 @@ console.log(req.auth);
 {
   mode: 'test',
   tenantId: 'demo1234',
-  userId: 1,
+  userId: 5,
   userUuid: 'ab53dbdc-bb1a-4d4d-9edf-683a6ca3f609',
   isConfirmed: false,
   authorization: {
@@ -514,7 +518,7 @@ console.log(req.auth);
 
 With this information, you can perform further checks as desired, or use the `userId` or `userUuid` to look up user information to return.
 
-For example, if you wanted to limit a route to admin users, you could check against the `authorization` object from the verified access token:
+For example, if you wanted to limit a route to admin users only, you could check against the `authorization` object from the verified access token, and reject any tokens that don't have an `admin` role:
 
 ```js
 // Node.js example (Express.js)
@@ -532,7 +536,7 @@ app.get("/users", (req, res) => {
 
 ## React SSO (Single Sign On)
 
-With the basics in place, you can add social identity providers like Google, Facebook, and LinkedIn to your React application, or business identity providers like Azure AD, Office365, and more.
+With your Toolkit forms in place, you can add social identity providers like Google, Facebook, and LinkedIn to your React application, or business identity providers like Azure AD, Office365, and more.
 
 You do this by creating an application with the identity provider (e.g. Google), and then adding that application's credentials to the Userfront dashboard. The result is a modified sign on experience:
 
