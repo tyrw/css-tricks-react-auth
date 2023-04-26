@@ -27,7 +27,7 @@ export default function App() {
         <nav>
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <Link to="/">Home Page</Link>
             </li>
             <li>
               <Link to="/login">Login</Link>
